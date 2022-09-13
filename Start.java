@@ -1,20 +1,23 @@
 import java.util.*;
 
+
 public class Start {
     private final String BLUE = "\033[0;34m";
     private final String YELLOW = "\u001B[33m";
-    private final String GREY= "\u001B[0m";
+    private final String GREY = "\u001B[0m";
     private final String WHITE_BOLD = "\033[1;37m";
     private final String difficulty;
     private final int[][] board;
     private final boolean[][] available;
     private final boolean[][] changed;
+    private final int[][] solution;
 
     Start(String level) {
         difficulty = level;
         board = new int[9][9];
         available = new boolean[9][9];
         changed = new boolean[9][9];
+        solution = new int[9][9];
 
     }
 
@@ -55,40 +58,74 @@ public class Start {
     }
 
     //prints board
-    public void print() {
-        int countCol=1;
+    public void print(int[][] board) {
+        int countCol = 1;
         System.out.print("   ");
-        for(int x=0;x<9;x++){
-            System.out.print(WHITE_BOLD+x+GREY+"  ");
-        }
+        System.out.print(WHITE_BOLD + "  0  1  2    3  4  5    6  7  8  " + GREY + "  ");
+
         System.out.println();
         for (int row = 0; row < 9; row++) {
+            if ((row == 0) || (row == 3) || (row == 6)) {
+                System.out.println("   ----------------------------------");
+            }
             for (int col = 0; col < 9; col++) {
-                if(col==0){
-                    System.out.print(WHITE_BOLD+countCol+GREY+" ");
-                    if(countCol==1){
+                if (col == 0) {
+                    System.out.print(WHITE_BOLD + countCol + GREY + " ");
+                    if (countCol == 1) {
                         System.out.print(" ");
                     }
-                    countCol+=9;
+                    countCol += 9;
                 }
-
+                if ((col == 0) | (col == 3) | (col == 6)) {
+                    System.out.print("| ");
+                }
                 if (changed[row][col]) {
-
                     System.out.print(BLUE + board[row][col] + GREY + "  ");
-                } else {
+                } else{
                     if (available[row][col]) {
                         System.out.print(YELLOW + board[row][col] + GREY + "  ");
-                    } else {
+                    } else{
                         System.out.print(board[row][col] + "  ");
                     }
                 }
-
-
+                    if (col == 8) {
+                        System.out.print("|");
+                    }
+            }
+            if (row == 8) {
+                System.out.println();
+                System.out.println("   ----------------------------------");
             }
             System.out.println();
         }
     }
 
+    //prints solution board to terminal
+    public void printSolution() {
+        print(solution);
+        /*System.out.println("-----------------------------");
+        System.out.print("   ");
+        for (int x = 0; x < 9; x++) {
+            System.out.print(WHITE_BOLD + x + GREY + "  ");
+        }
+        System.out.println();
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (col == 0) {
+                    System.out.print(WHITE_BOLD + countCol + GREY + " ");
+                    if (countCol == 1) {
+                        System.out.print(" ");
+                    }
+                    countCol += 9;
+                }
+                System.out.print(solution[row][col] + "  ");
+            }
+            System.out.println();
+        }
+        System.out.println("-----------------------------");*/
+    }
+
+    //converts input to coordinate on board
     public int[] getIndexBoard(int i) {
         int[] coord = new int[2];
         int row = (i / 9) * 1;
@@ -105,11 +142,9 @@ public class Start {
         coord[0] = row;
         coord[1] = col;
         return coord;
-
-
     }
 
-    //removes all spaces with difficulty for 2d array
+    //sets all spaces to 0 from the genList for 2d array
     public void remove_spaces() {
         ArrayList<Integer> list_spaces = genList();
         for (int i : list_spaces) {
@@ -119,19 +154,26 @@ public class Start {
         }
     }
 
+    //starter method that runs sequence
     public void start() {
         gen_full_board();
         remove_spaces();
         setBools();
-        print();
-        System.out.println("\nThe numbers on the first column indicate the first cell's value in the row.");
-        System.out.println("The numbers on the first row indicate how many you need to add to the number in the column to reach that cell!\n");
+        System.out.println("\n\n\n\n\n");
+        print(board);
+        System.out.println("The numbers on the first column indicate the first cell's value in the row.");
+        System.out.println("The numbers on the first row indicate how many you need to add to the number in the column to reach that cell!");
+        System.out.println("At any time type -1 to see the solution...don't type this by accident!\n");
         while (!correct(1)) {
             promptUser();
-            print();
+            print(board);
         }
         System.out.println("You Won! Congrats!");
+        tryAgain();
+    }
 
+    //prompts user to try again and calls main method
+    public void tryAgain() {
         while (true) {
             Scanner in = new Scanner(System.in);  // Create a Scanner object
             System.out.println("Would you like to try again? (yes or no)");
@@ -143,21 +185,23 @@ public class Start {
             }
             if (option.equals("no")) {
                 System.out.println(":( ok thank you for the playing!");
-                break;
+                System.exit(0);
             }
 
         }
-
-
     }
 
+    //promots user for cell and number one valid time
     public void promptUser() {
         while (true) {
             Scanner in = new Scanner(System.in);  // Create a Scanner object
             System.out.println("Enter cell to change (1-81)");
             int cell = in.nextInt();  // Read user input
+            if (cell == -1) {
+                printSolution();
+                tryAgain();
+            }
             if ((cell >= 1) & (cell <= 81)) {
-
                 int[] coord = getIndexBoard(cell);
                 int xCord = coord[0];
                 int yCord = coord[1];
@@ -165,17 +209,21 @@ public class Start {
                     while (true) {
                         System.out.println("Enter number 1-9");
                         int num = in.nextInt();  // Read user input
+                        if (num == -1) {
+                            printSolution();
+                            tryAgain();
+                        }
                         if ((num > 0) & (num <= 9)) {
                             board[xCord][yCord] = num;
                             changed[xCord][yCord] = true;
                             break;
                         }
-                        print();
+                        print(board);
                     }
                     break;
                 }
             }
-            print();
+            print(board);
 
         }
     }
@@ -183,35 +231,29 @@ public class Start {
     //gen board with everything solved
     public void gen_full_board() {
         int[][] copy = new int[9][9];
+
+        //makes a copy of first board
         for (int x = 0; x < 9; x++) {
             for (int y = 0; y < 9; y++) {
                 copy[x][y] = board[x][y];
             }
         }
         while (true) {
+            //restarts board each time failed until correct
             for (int x = 0; x < 9; x++) {
                 for (int y = 0; y < 9; y++) {
                     board[x][y] = copy[x][y];
-
                 }
             }
+            //if solved board dosent work, do again, if does breaks
             if (gen2(board)) {
                 break;
             }
         }
     }
 
-    public void setBools() {
-        for (int x = 0; x < 9; x++) {
-            for (int y = 0; y < 9; y++) {
-                if (board[x][y] == 0) {
-                    available[x][y] = true;
-                }
-            }
-        }
-    }
-
-    //solves board for 2d array helper func
+    //solves board for 2d array
+    //recursively find solution
     public boolean gen2(int[][] board) {
         //iterates through 2d array 9x9
         for (int x = 0; x < 9; x++) {
@@ -223,19 +265,17 @@ public class Start {
                     //finds int that works with current layout, if none work return false and recurse
                     for (int n : numbers) {
                         board[x][y] = n;
-
+                        solution[x][y] = n;
                         if (correct(0)) {
                             if (gen2(board)) {
                                 return true;
                             } else {
-
                                 board[x][y] = 0;
                             }
                         }
 
                     }
                     return false;
-
                 }
 
             }
@@ -243,10 +283,23 @@ public class Start {
         return true;
     }
 
+    //sets bools board to true or false based on 0 or not 0
+    public void setBools() {
+        for (int x = 0; x < 9; x++) {
+            for (int y = 0; y < 9; y++) {
+                if (board[x][y] == 0) {
+                    available[x][y] = true;
+                }
+            }
+        }
+    }
+
+    //is correct
     public boolean correct(int zero) {
         return ((correct_rows(zero) & correct_cols(zero)) & correct_matrices(zero));
     }
 
+    //are rows correct
     public boolean correct_rows(int zero) {
         for (int x = 0; x < 9; x++) {
             ArrayList<Integer> row = new ArrayList<Integer>();
@@ -260,7 +313,6 @@ public class Start {
                 } else {
                     row.add(board[x][y]);
                 }
-
             }
             Set<Integer> dups = new HashSet<Integer>();
             for (int i : row) {
@@ -273,6 +325,7 @@ public class Start {
         return true;
     }
 
+    //are cols correct
     public boolean correct_cols(int zero) {
         for (int x = 0; x < 9; x++) {
             ArrayList<Integer> row = new ArrayList<Integer>();
@@ -298,9 +351,9 @@ public class Start {
         return true;
     }
 
+    //are 3x3's matrices correct
     public boolean correct_matrices(int zero) {
         for (int x = 0; x <= 6; x += 3) {
-
             for (int y = 0; y <= 6; y += 3) {
                 ArrayList<Integer> row = new ArrayList<Integer>();
                 for (int v = 0; v <= 2; v++) {
@@ -312,7 +365,6 @@ public class Start {
                         } else {
                             row.add(board[x + v][y + z]);
                         }
-
                     }
                 }
                 Set<Integer> dups = new HashSet<Integer>();

@@ -12,7 +12,6 @@ public class Void {
             if (difficulty.equals("easy") || difficulty.equals("medium") || difficulty.equals("hard")) {
 
                 Start s = new Start(difficulty);
-                //make menu
                 s.start();
                 break;
             }
