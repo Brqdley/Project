@@ -103,26 +103,6 @@ public class Start {
     //prints solution board to terminal
     public void printSolution() {
         print(solution);
-        /*System.out.println("-----------------------------");
-        System.out.print("   ");
-        for (int x = 0; x < 9; x++) {
-            System.out.print(WHITE_BOLD + x + GREY + "  ");
-        }
-        System.out.println();
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
-                if (col == 0) {
-                    System.out.print(WHITE_BOLD + countCol + GREY + " ");
-                    if (countCol == 1) {
-                        System.out.print(" ");
-                    }
-                    countCol += 9;
-                }
-                System.out.print(solution[row][col] + "  ");
-            }
-            System.out.println();
-        }
-        System.out.println("-----------------------------");*/
     }
 
     //converts input to coordinate on board
