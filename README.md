@@ -1,3 +1,3 @@
 # Sudoku
 
-I built this command-line game to learn more about Java.
+I built this command-line game to improve my Java programming skills.
